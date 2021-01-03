@@ -1,0 +1,5 @@
+<section class="rounded-lg shadow-sm mb-4 bg-white p-4" v-if="state">
+    <h1 class="font-bold text-lg">{{state.primary}}</h1>
+    <p class="text-sm mt-2 mb-4">{{state.secondary}}</p>
+    <a :href="state.button_url" class="text-sm leading-6 font-medium rounded-md text-white bg-pink-600 hover:bg-pink-500 active:bg-pink-700 transition ease-in-out duration-150 px-3 py-1 inline-block">{{state.button_text}}</a>
+</section>

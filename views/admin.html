@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin</title>
+  <link rel="stylesheet" href="tailwind.min.css">
+</head>
+
+<body>
+  <div id="app">
+    <div class="bg-gray-800 pb-32">
+      <nav class="bg-gray-800">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+          <div class="border-b border-gray-700">
+            <div class="flex items-center justify-between h-16 px-4 sm:px-0">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <img class="h-8 w-8" src="/fist.svg" alt="You Got This Fist Logo">
+                </div>
+                <div class="hidden md:block">
+                  <div class="ml-6 flex items-baseline space-x-4">
+                    <button v-for="section in sections" class="pr-3 py-2 rounded-md text-sm font-medium text-gray-300" @click="currentSection = section">{{section}}</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <header class="py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h1 class="text-3xl font-bold text-white">{{currentSection}}</h1>
+        </div>
+      </header>
+    </div>
+
+    <main class="-mt-32" id="app">
+
+      <!-- Now Box -->
+      <div v-if="currentSection == 'Now Box'">
+        <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
+          <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
+            <div>
+              <label for="primary" class="block text-sm font-medium text-gray-700">Primary</label>
+              <div class="mt-1">
+                <input v-model="now.form.primary" id="primary" class="shadow-md focus:ring-indigo-500 focus:border-indigo-500 block p-2 w-full sm:text-sm border-gray-100 border rounded-md outline-none">
+              </div>
+            </div>
+            <div class="mt-4">
+              <label for="secondary" class="block text-sm font-medium text-gray-700">Secondary</label>
+              <div class="mt-1">
+                <input v-model="now.form.secondary" id="secondary" class="shadow-md focus:ring-indigo-500 focus:border-indigo-500 block p-2 w-full sm:text-sm border-gray-100 border rounded-md outline-none">
+              </div>
+            </div>
+            <div class="mt-4">
+              <label for="url" class="block text-sm font-medium text-gray-700">URL</label>
+              <div class="mt-1">
+                <input v-model="now.form.button_url" id="url" class="shadow-md focus:ring-indigo-500 focus:border-indigo-500 block p-2 w-full sm:text-sm border-gray-100 border rounded-md outline-none">
+              </div>
+            </div>
+            <div class="mt-4">
+              <label for="text" class="block text-sm font-medium text-gray-700">Text</label>
+              <div class="mt-1">
+                <input v-model="now.form.button_text" id="text" class="shadow-md focus:ring-indigo-500 focus:border-indigo-500 block p-2 w-full sm:text-sm border-gray-100 border rounded-md outline-none">
+              </div>
+            </div>
+            <button @click="broadcastNowBox" type="button" class="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Update Now Box</button>
+          </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
+          <h2 class="text-xl font-bold text-black mb-5">Prefills from Airtable</h2>
+          <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
+            <button v-for="option in now.options" @click="now.form = option" type="button" class="mr-2 inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">{{option.label}}</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- State & Debugging -->
+      <div v-if="currentSection == 'State & Debugging'">
+        <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
+          <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6 mb-4">
+            <div class="flex mb-4">
+              <label class="inline-flex items-center mt-3">
+                  <input type="radio" id="pre" value="pre" v-model="state.phase" class="form-radio h-5 w-5 text-gray-600" checked><span class="ml-2 mr-4 text-gray-700">pre</span>
+              </label>
+              <label class="inline-flex items-center mt-3">
+                  <input type="radio" id="live" value="live" v-model="state.phase" class="form-radio h-5 w-5 text-gray-600" checked><span class="ml-2 mr-4 text-gray-700">live</span>
+              </label>
+              <label class="inline-flex items-center mt-3">
+                  <input type="radio" id="post" value="post" v-model="state.phase" class="form-radio h-5 w-5 text-gray-600" checked><span class="ml-2 mr-4 text-gray-700">post</span>
+              </label>
+            </div>
+            <button @click="updatePhase" type="button" class="mr-2 inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Update Event Phase</button>
+          </div>
+          <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
+            <div>
+              <button @click="refresh" type="button" class="mr-2 inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Force Client Refresh</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/socket.io.js"></script>
+  <script src="/vue.min.js"></script>
+  <script>
+    const socket = io()
+    const app = new Vue({
+      el: '#app',
+      data: {
+        sections: ['Now Box', 'Announcement', 'State & Debugging'],
+        currentSection: 'State & Debugging',
+        socket: io(),
+        now: {
+          options: [],
+          form: { primary: '', secondary: '', button_url: '', button_text: '' }
+        },
+        state: {
+          phase: ''
+        }
+      },
+      created() {
+        this.getSchedule()
+      },
+      methods: {
+        async getSchedule() {
+          this.now.options = await fetch('/now').then(r => r.json())
+        },
+        broadcastNowBox() {
+          const { primary, secondary, button_url, button_text } = this.now.form
+          this.socket.emit('now', { primary, secondary, button_url, button_text })
+          this.now.form = { primary: '', secondary: '', button_url: '', button_text: '' }
+        },
+        refresh() {
+          if(confirm('You sure?')) {
+            this.socket.emit('refresh')
+          }
+        },
+        updatePhase() {
+          this.socket.emit('phase', { phase: this.state.phase })
+        }
+      },
+      computed: {
+      }
+    })
+  </script>
+</body>
+
+</html>
