@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
     res.render('index.html')
 })
 
-app.get('/admin', (req, res) => {
+app.get('/operator', (req, res) => {
     res.render('admin.html')
 })
 
@@ -53,37 +53,47 @@ app.get('/state', async (req, res) => {
 })
 
 io.on('connection', (socket) => {
+    const key = process.env.ADMIN_KEY
+
     socket.on('now', async data => {
         console.log('Event of type now')
-        io.emit('now', data)
-        for(let key of ['primary', 'secondary', 'button_url', 'button_text']) {
-            await db.state.updateWhere(`key = "${key}"`, { value: data[key] })
+        console.log(data)
+        if(data.key == key) {
+            io.emit('now', data)
+            for(let key of ['primary', 'secondary', 'button_url', 'button_text']) {
+                await db.state.updateWhere(`key = "${key}"`, { value: data[key] })
+            }
         }
     })
 
     socket.on('phase', async data => {
-        console.log('Event of type phase')
         io.emit('phase', data)
-        await db.state.updateWhere(`key = "phase"`, { value: data.phase })
+        if(data.key == key) {
+            await db.state.updateWhere(`key = "phase"`, { value: data.phase })
+        }
     })
 
     socket.on('announcement:create', async data => {
-        try {
-            console.log('Event of type announcement')
+        console.log('Event of type announcement:create')
+        if(data.key == key) {
             io.emit('announcement:create', data)
             await db.announcements.create(data)
-        } catch(e) { console.log(e) }
+        }
     })
 
-    socket.on('announcement:delete', async uaid => {
-        console.log(uaid)
-        io.emit('announcement:delete', uaid)
-        await db.announcements.deleteWhere(`uaid = "${uaid}"`)
+    socket.on('announcement:delete', async data => {
+        console.log('Event of type announcement:delete')
+        if(data.key == key) {
+            io.emit('announcement:delete', data.uaid)
+            await db.announcements.deleteWhere(`uaid = "${data.uaid}"`)
+        }
     })
 
     socket.on('refresh', data => {
         console.log('Event of type refresh')
-        io.emit('refresh')
+        if(data.key == key) {
+            io.emit('refresh')
+        }
     })
 });
 

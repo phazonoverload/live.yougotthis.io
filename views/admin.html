@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin</title>
+  <title>Operator</title>
   <link rel="stylesheet" href="tailwind.min.css">
 </head>
 
@@ -19,9 +19,10 @@
                 <div class="flex-shrink-0">
                   <img class="h-8 w-8" src="/fist.svg" alt="You Got This Fist Logo">
                 </div>
-                <div class="hidden md:block">
-                  <div class="ml-6 flex items-baseline space-x-4">
+                <div>
+                  <div class="ml-6 flex flex-row justify-start items-baseline space-x-4">
                     <button v-for="section in sections" class="pr-3 py-2 rounded-md text-sm font-medium text-gray-300" @click="currentSection = section">{{section}}</button>
+                    <button class="ml-auto pr-3 py-2 rounded-md text-sm font-medium text-gray-300" @click="changeKey">Change Key</button>
                   </div>
                 </div>
               </div>
@@ -156,6 +157,7 @@
         sections: ['Now Box', 'Announcements', 'State & Debugging'],
         currentSection: 'Now Box',
         socket: io(),
+        key: localStorage.getItem('key') || false,
         now: {
           options: [],
           form: { primary: '', secondary: '', button_url: '', button_text: '' }
@@ -171,6 +173,10 @@
       created() {
         this.getSchedule()
         this.setupAnnouncements()
+        if(!localStorage.getItem('key')) {
+          const key = prompt('Admin Key')
+          localStorage.setItem('key', key)
+        }
       },
       methods: {
         async setupAnnouncements() {
@@ -180,29 +186,33 @@
         },
         deleteAnnouncement(uaid) {
           this.announcements.list = this.announcements.list.filter(a => a.uaid != uaid)
-          this.socket.emit('announcement:delete', uaid)
+          this.socket.emit('announcement:delete', { uaid, key: this.key })
         },
         async getSchedule() {
           this.now.options = await fetch('/now').then(r => r.json())
         },
         broadcastNowBox() {
           const { primary, secondary, button_url, button_text } = this.now.form
-          this.socket.emit('now', { primary, secondary, button_url, button_text })
+          this.socket.emit('now', { primary, secondary, button_url, button_text, key: this.key })
           this.now.form = { primary: '', secondary: '', button_url: '', button_text: '' }
         },
         refresh() {
           if(confirm('You sure?')) {
-            this.socket.emit('refresh')
+            this.socket.emit('refresh', { key: this.key })
           }
         },
         updatePhase() {
-          this.socket.emit('phase', { phase: this.state.phase })
+          this.socket.emit('phase', { phase: this.state.phase, key: this.key })
         },
         sendAnnouncement() {
           const { primary, link_url, link_text } = this.announcements.form
           const uaid = Math.random().toString(36).substr(2, 5)
-          this.socket.emit('announcement:create', { primary, link_url, link_text, uaid })
+          this.socket.emit('announcement:create', { primary, link_url, link_text, uaid, key: this.key })
           this.announcements.form = { primary: '', link_url: '', link_text: '' }
+        },
+        changeKey() {
+          this.key = prompt('Change key from ' + this.key)
+          localStorage.setItem('key', this.key)
         }
       },
       computed: {
