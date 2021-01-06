@@ -10,7 +10,8 @@ const airtableCreds = { baseID: process.env.AIRTABLE_BASE_ID, apiKey: process.en
 const db = {
     now: new Airtable({ ...airtableCreds, tableName: 'now' }),
     state: new Airtable({ ...airtableCreds, tableName: 'state' }),
-    announcements: new Airtable({ ...airtableCreds, tableName: 'announcements' })
+    announcements: new Airtable({ ...airtableCreds, tableName: 'announcements' }),
+    sponsors: new Airtable({ ...airtableCreds, tableName: 'sponsors' }),
 }
 
 app.use(express.static('public'))
@@ -33,12 +34,17 @@ app.get('/now', async (req, res) => {
 app.get('/state', async (req, res) => {
     console.log('GET /state')
     const records = await db.state.read({})
-    const payload = {}
+    const state = {}
     for(let record of records) {
-        payload[record.fields.key] = record.fields.value
+        state[record.fields.key] = record.fields.value
     }
     const announcements = await db.announcements.read({ sort: [{field: 'created', direction: 'desc'}] })
-    res.json({ ...payload, announcements: announcements.map(a => a.fields) })
+    const sponsors = await db.sponsors.read({ sort: [{field: 'name', direction: 'asc'}] })
+    res.json({
+        ...state,
+        announcements: announcements.map(a => a.fields),
+        sponsors: sponsors.map(s => s.fields)
+    })
 })
 
 io.on('connection', (socket) => {

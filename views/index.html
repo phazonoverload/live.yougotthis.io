@@ -42,7 +42,22 @@
             </ul>
           </div>
 
-          <div v-if="sections.current == 'Sponsors'" class="p-4">Sponsors</div>
+          <div v-if="sections.current == 'Sponsors'" class="p-4 flex-1 overflow-y-auto">
+            <ul class="h-px">
+              <li v-for="sponsor in sponsors" class="bg-white border px-3 py-2 rounded-md mb-4 text-sm">
+                <h2 class="font-bold text-lg">{{sponsor.name}}</h2>
+                <p>{{sponsor.description}}</p>
+                <p class="mt-1">
+                  <a v-if="sponsor.video" :href="sponsor.video[0].url" class="text-pink-600 mr-2" target="_blank" rel="noopener noreferrer">📹 Video</a>
+                  <a :href="sponsor.url" class="text-pink-600" target="_blank" rel="noopener noreferrer">Visit {{sponsor.name}}</a>
+                </p>
+                <!-- <p>{{announcement.primary}}</p>
+                <p v-if="announcement.link_url && announcement.link_text" class="mt-1">
+                  <a :href="announcement.link_url" class="text-pink-600" target="_blank" rel="noopener noreferrer">{{announcement.link_text}}</a>
+                </p> -->
+              </li>
+            </ul>
+          </div>
           <div v-if="sections.current == 'About'" class="p-4">About</div>
         </div>
       </section>
@@ -60,9 +75,10 @@
         state: false,
         socket: io(),
         announcements: [],
+        sponsors: [],
         sections: {
           options: ['Announcements', 'Sponsors', 'About'],
-          current: 'Announcements',
+          current: 'Sponsors',
         }
       },
       created() {
@@ -73,6 +89,7 @@
         async getCurrentInfo() {
           this.state = await fetch('/state').then(r => r.json())
           this.announcements = this.state.announcements
+          this.sponsors = this.state.sponsors
           Vue.nextTick(() => {
             if(this.state.phase == 'live') this.setupPlayer()
           })
