@@ -17,6 +17,7 @@
     "nedb": "^1.8.0",
     "nedb-promise": "^2.0.1",
     "nunjucks": "^3.2.2",
+    "showdown": "^1.9.1",
     "socket.io": "^3.0.4"
   }
 }

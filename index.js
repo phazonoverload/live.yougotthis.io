@@ -5,6 +5,7 @@ const http = require('http').createServer(app)
 const io = require('socket.io')(http)
 const Airtable = require('airtable-plus')
 const nunjucks = require('nunjucks')
+const showdown = require('showdown')
 
 const airtableCreds = { baseID: process.env.AIRTABLE_BASE_ID, apiKey: process.env.AIRTABLE_API_KEY }
 const db = {
@@ -12,10 +13,12 @@ const db = {
     state: new Airtable({ ...airtableCreds, tableName: 'state' }),
     announcements: new Airtable({ ...airtableCreds, tableName: 'announcements' }),
     sponsors: new Airtable({ ...airtableCreds, tableName: 'sponsors' }),
+    about: new Airtable({ ...airtableCreds, tableName: 'about' }),
 }
 
 app.use(express.static('public'))
 nunjucks.configure('views', { autoescape: true, express: app, tags: { variableStart: '{$', variableEnd: '$}' } })
+const converter = new showdown.Converter()
 
 app.get('/', (req, res) => {
     res.render('index.html')
@@ -40,10 +43,12 @@ app.get('/state', async (req, res) => {
     }
     const announcements = await db.announcements.read({ sort: [{field: 'created', direction: 'desc'}] })
     const sponsors = await db.sponsors.read({ sort: [{field: 'name', direction: 'asc'}] })
+    const about = await db.about.read({})
     res.json({
         ...state,
         announcements: announcements.map(a => a.fields),
-        sponsors: sponsors.map(s => s.fields)
+        sponsors: sponsors.map(s => s.fields),
+        about: converter.makeHtml(about[0].fields.content)
     })
 })
 

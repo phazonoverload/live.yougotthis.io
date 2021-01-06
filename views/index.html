@@ -6,6 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User</title>
   <link rel="stylesheet" href="tailwind.min.css">
+  <style>
+    #marked p { margin-bottom: 1em; }
+    #marked a { color: rgba(219,39,119,var(--tw-bg-opacity)) }
+  </style>
 </head>
 
 <body class="flex flex-col h-screen">
@@ -51,14 +55,12 @@
                   <a v-if="sponsor.video" :href="sponsor.video[0].url" class="text-pink-600 mr-2" target="_blank" rel="noopener noreferrer">📹 Video</a>
                   <a :href="sponsor.url" class="text-pink-600" target="_blank" rel="noopener noreferrer">Visit {{sponsor.name}}</a>
                 </p>
-                <!-- <p>{{announcement.primary}}</p>
-                <p v-if="announcement.link_url && announcement.link_text" class="mt-1">
-                  <a :href="announcement.link_url" class="text-pink-600" target="_blank" rel="noopener noreferrer">{{announcement.link_text}}</a>
-                </p> -->
               </li>
             </ul>
           </div>
-          <div v-if="sections.current == 'About'" class="p-4">About</div>
+          <div v-if="sections.current == 'About'" class="p-4">
+            <div v-html="state.about" class="text-sm" id="marked"></div>
+          </div>
         </div>
       </section>
     </aside>
@@ -78,7 +80,7 @@
         sponsors: [],
         sections: {
           options: ['Announcements', 'Sponsors', 'About'],
-          current: 'Sponsors',
+          current: 'About',
         }
       },
       created() {
