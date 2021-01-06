@@ -78,6 +78,47 @@
         </div>
       </div>
 
+      <!-- Announcements -->
+      <div v-if="currentSection == 'Announcements'">
+        <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
+          <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6 mb-4">
+            <div>
+              <label for="primary" class="block text-sm font-medium text-gray-700">Text</label>
+              <div class="mt-1">
+                <input v-model="announcements.form.primary" id="primary" class="shadow-md focus:ring-indigo-500 focus:border-indigo-500 block p-2 w-full sm:text-sm border-gray-100 border rounded-md outline-none">
+              </div>
+            </div>
+            <div class="mt-4">
+              <label for="url" class="block text-sm font-medium text-gray-700">URL</label>
+              <div class="mt-1">
+                <input v-model="announcements.form.link_url" id="url" class="shadow-md focus:ring-indigo-500 focus:border-indigo-500 block p-2 w-full sm:text-sm border-gray-100 border rounded-md outline-none">
+              </div>
+            </div>
+            <div class="mt-4">
+              <label for="text" class="block text-sm font-medium text-gray-700">Text</label>
+              <div class="mt-1">
+                <input v-model="announcements.form.link_text" id="text" class="shadow-md focus:ring-indigo-500 focus:border-indigo-500 block p-2 w-full sm:text-sm border-gray-100 border rounded-md outline-none">
+              </div>
+            </div>
+            <button @click="sendAnnouncement" type="button" class="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Send Announcement</button>
+          </div>
+
+          <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6 mb-4">
+            <ul>
+              <li v-for="announcement in announcements.list" class="bg-white border px-3 py-2 rounded-md mb-4 text-sm">
+                <p>{{announcement.primary}}</p>
+                <p v-if="announcement.link_url && announcement.link_text" class="mt-1">
+                  <a :href="announcement.link_url" class="text-pink-600" target="_blank" rel="noopener noreferrer">{{announcement.link_text}}</a>
+                </p>
+                <button class="mt-2 inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" @click="deleteAnnouncement(announcement.uaid)">Delete</button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+
+
       <!-- State & Debugging -->
       <div v-if="currentSection == 'State & Debugging'">
         <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
@@ -112,12 +153,16 @@
     const app = new Vue({
       el: '#app',
       data: {
-        sections: ['Now Box', 'Announcement', 'State & Debugging'],
-        currentSection: 'State & Debugging',
+        sections: ['Now Box', 'Announcements', 'State & Debugging'],
+        currentSection: 'Announcements',
         socket: io(),
         now: {
           options: [],
           form: { primary: '', secondary: '', button_url: '', button_text: '' }
+        },
+        announcements: {
+          list: [],
+          form: { primary: '', link_url: '', link_text: '' }
         },
         state: {
           phase: ''
@@ -125,8 +170,18 @@
       },
       created() {
         this.getSchedule()
+        this.setupAnnouncements()
       },
       methods: {
+        async setupAnnouncements() {
+          const state = await fetch('/state').then(r => r.json())
+          this.announcements.list = state.announcements
+          this.socket.on('announcement:create', data => this.announcements.list.unshift(data))
+        },
+        deleteAnnouncement(uaid) {
+          this.announcements.list = this.announcements.list.filter(a => a.uaid != uaid)
+          this.socket.emit('announcement:delete', uaid)
+        },
         async getSchedule() {
           this.now.options = await fetch('/now').then(r => r.json())
         },
@@ -142,6 +197,12 @@
         },
         updatePhase() {
           this.socket.emit('phase', { phase: this.state.phase })
+        },
+        sendAnnouncement() {
+          const { primary, link_url, link_text } = this.announcements.form
+          const uaid = Math.random().toString(36).substr(2, 5)
+          this.socket.emit('announcement:create', { primary, link_url, link_text, uaid })
+          this.announcements.form = { primary: '', link_url: '', link_text: '' }
         }
       },
       computed: {

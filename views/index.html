@@ -25,12 +25,23 @@
     </main>
     <aside class="col-span-3 flex flex-col">
       {% include "_now.html" %}
-      <section class="rounded-lg flex-1 bg-white">
-        <nav class="-mb-px flex w-full block" aria-label="Tabs">
-          <button v-for="option in sections.options" class="py-4 px-2 text-center border-b-2 font-medium text-sm flex-1" :class="[option == sections.current ? 'border-pink-500 text-pink-600' : 'border-gray-100 text-gray-500 hover:text-gray-700 hover:border-gray-300']" @click="sections.current = option">{{option}}</button>
+      <section class="rounded-lg flex-1 bg-white flex flex-col">
+        <nav class="-mb-px flex w-full block z-10" aria-label="Tabs">
+          <button v-for="option in sections.options" class="px-4 py-3 text-center border-b-2 font-medium text-xs flex-1" :class="[option == sections.current ? 'border-pink-500 text-pink-600' : 'border-gray-100 text-gray-500 hover:text-gray-700 hover:border-gray-300']" @click="sections.current = option">{{option}}</button>
         </nav>
-        <div id="main">
-          <div v-if="sections.current == 'Announcements'" class="p-4">Announcements</div>
+
+        <div id="main" class="flex-1 flex flex-col">
+          <div v-if="sections.current == 'Announcements'" class="p-4 flex-1 overflow-y-auto">
+            <ul class="h-px">
+              <li v-for="announcement in announcements" class="bg-white border px-3 py-2 rounded-md mb-4 text-sm">
+                <p>{{announcement.primary}}</p>
+                <p v-if="announcement.link_url && announcement.link_text" class="mt-1">
+                  <a :href="announcement.link_url" class="text-pink-600" target="_blank" rel="noopener noreferrer">{{announcement.link_text}}</a>
+                </p>
+              </li>
+            </ul>
+          </div>
+
           <div v-if="sections.current == 'Sponsors'" class="p-4">Sponsors</div>
           <div v-if="sections.current == 'About'" class="p-4">About</div>
         </div>
@@ -48,9 +59,10 @@
       data: {
         state: false,
         socket: io(),
+        announcements: [],
         sections: {
           options: ['Announcements', 'Sponsors', 'About'],
-          current: 'Announcements'
+          current: 'Announcements',
         }
       },
       created() {
@@ -60,6 +72,7 @@
       methods: {
         async getCurrentInfo() {
           this.state = await fetch('/state').then(r => r.json())
+          this.announcements = this.state.announcements
           Vue.nextTick(() => {
             if(this.state.phase == 'live') this.setupPlayer()
           })
@@ -67,6 +80,8 @@
         setupSocketEvents() {
           this.socket.on('now', data => this.state = { ...this.state, ...data })
           this.socket.on('refresh', () => location.reload())
+          this.socket.on('announcement:create', data => this.announcements.unshift(data))
+          this.socket.on('announcement:delete', uaid => this.announcements = this.announcements.filter(a => a.uaid != uaid))
           this.socket.on('phase', data => {
             this.state.phase = data.phase;
             Vue.nextTick(() => {

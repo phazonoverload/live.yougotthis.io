@@ -10,7 +10,7 @@ const airtableCreds = { baseID: process.env.AIRTABLE_BASE_ID, apiKey: process.en
 const db = {
     now: new Airtable({ ...airtableCreds, tableName: 'now' }),
     state: new Airtable({ ...airtableCreds, tableName: 'state' }),
-    announcements: new Airtable({ ...airtableCreds, tableName: 'annoucements' })
+    announcements: new Airtable({ ...airtableCreds, tableName: 'announcements' })
 }
 
 app.use(express.static('public'))
@@ -37,7 +37,8 @@ app.get('/state', async (req, res) => {
     for(let record of records) {
         payload[record.fields.key] = record.fields.value
     }
-    res.json(payload)
+    const announcements = await db.announcements.read({ sort: [{field: 'created', direction: 'desc'}] })
+    res.json({ ...payload, announcements: announcements.map(a => a.fields) })
 })
 
 io.on('connection', (socket) => {
@@ -53,6 +54,20 @@ io.on('connection', (socket) => {
         console.log('Event of type phase')
         io.emit('phase', data)
         await db.state.updateWhere(`key = "phase"`, { value: data.phase })
+    })
+
+    socket.on('announcement:create', async data => {
+        try {
+            console.log('Event of type announcement')
+            io.emit('announcement:create', data)
+            await db.announcements.create(data)
+        } catch(e) { console.log(e) }
+    })
+
+    socket.on('announcement:delete', async uaid => {
+        console.log(uaid)
+        io.emit('announcement:delete', uaid)
+        await db.announcements.deleteWhere(`uaid = "${uaid}"`)
     })
 
     socket.on('refresh', data => {
