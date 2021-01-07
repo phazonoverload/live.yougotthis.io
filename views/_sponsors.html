@@ -1,0 +1,12 @@
+<div v-if="sections.current == 'Sponsors'" class="p-4 py-0 lg:py-4 flex-1 overflow-y-auto">
+    <ul class="lg:h-px">
+      <li v-for="sponsor in sponsors" class="bg-white border px-3 py-2 rounded-md mb-4 text-sm">
+        <h2 class="font-bold text-lg">{{sponsor.name}}</h2>
+        <p>{{sponsor.description}}</p>
+        <p class="mt-1">
+          <a v-if="sponsor.video" :href="sponsor.video[0].url" class="text-pink-600 mr-2" target="_blank" rel="noopener noreferrer">📹 Video</a>
+          <a :href="sponsor.url" class="text-pink-600" target="_blank" rel="noopener noreferrer">Visit {{sponsor.name}}</a>
+        </p>
+      </li>
+    </ul>
+  </div>

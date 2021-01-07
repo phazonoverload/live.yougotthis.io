@@ -59,6 +59,7 @@ io.on('connection', (socket) => {
         console.log('Event of type now')
         console.log(data)
         if(data.key == key) {
+            delete data.key
             io.emit('now', data)
             for(let key of ['primary', 'secondary', 'button_url', 'button_text']) {
                 await db.state.updateWhere(`key = "${key}"`, { value: data[key] })
@@ -69,6 +70,7 @@ io.on('connection', (socket) => {
     socket.on('phase', async data => {
         io.emit('phase', data)
         if(data.key == key) {
+            delete data.key
             await db.state.updateWhere(`key = "phase"`, { value: data.phase })
         }
     })
@@ -76,6 +78,7 @@ io.on('connection', (socket) => {
     socket.on('announcement:create', async data => {
         console.log('Event of type announcement:create')
         if(data.key == key) {
+            delete data.key
             io.emit('announcement:create', data)
             await db.announcements.create(data)
         }
@@ -84,6 +87,7 @@ io.on('connection', (socket) => {
     socket.on('announcement:delete', async data => {
         console.log('Event of type announcement:delete')
         if(data.key == key) {
+            delete data.key
             io.emit('announcement:delete', data.uaid)
             await db.announcements.deleteWhere(`uaid = "${data.uaid}"`)
         }
@@ -92,6 +96,7 @@ io.on('connection', (socket) => {
     socket.on('refresh', data => {
         console.log('Event of type refresh')
         if(data.key == key) {
+            delete data.key
             io.emit('refresh')
         }
     })

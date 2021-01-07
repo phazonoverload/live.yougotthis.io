@@ -211,8 +211,11 @@
           this.announcements.form = { primary: '', link_url: '', link_text: '' }
         },
         changeKey() {
-          this.key = prompt('Change key from ' + this.key)
-          localStorage.setItem('key', this.key)
+          const key = prompt('Change key from ' + this.key)
+          if(key) {
+            this.key = key
+            localStorage.setItem('key', key)
+          }
         }
       },
       computed: {

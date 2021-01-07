@@ -1,67 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>You Got This From Your Couch</title>
-  <meta property="og:image" content="https://yougotthis.io/assets/couch/og.png"><meta name="description" content="An online community conference, which focuses on the non-technical core skills for a happy, healthy work life."><meta name="og:description" content="An online community conference, which focuses on the non-technical core skills for a happy, healthy work life."><meta name="monetization" content="$ilp.uphold.com/DBEbnWEmPyJJ"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✊</text></svg>">
-  <link rel="stylesheet" href="tailwind.min.css">
-  <style>
-    #marked p { margin-bottom: 1em; }
-    #marked a { color: rgba(219,39,119,var(--tw-bg-opacity)) }
-  </style>
-</head>
+<head>{% include "_head.html" %}</head>
 
-<body class="flex flex-col h-screen">
-
+<body class="flex flex-col h-screen bg-gray-800">
   {% include "_header.html" %}
 
-  <div id="app" class="flex-1 grid gap-4 grid-cols-12 p-6 bg-gray-800">
+  <div id="app" class="flex-1 lg:grid gap-4 grid-cols-12 p-6 max-w-screen-2xl mx-auto">
     <main class="col-span-9 flex flex-col">
-      <div class="bg-gray-900 rounded-lg shadow px-5 py-6 sm:px-6 flex-1" v-if="state && state.phase == 'pre'">
-        <h1 class="text-3xl font-bold text-white leading-relaxed">{{state.starting_soon_text}}</h1>
-      </div>
-      <div class="bg-gray-900 rounded-lg shadow px-5 py-6 sm:px-6 flex-1" v-if="state && state.phase == 'post'">
-        <h1 class="text-3xl font-bold text-white leading-relaxed">{{state.post_event_text}}</h1>
-      </div>
-      <video controls autoplay muted class="rounded-lg row-span-3 mb-4 flex-1 bg-black" v-if="state && state.phase == 'live'"></video>
-      <iframe :src="state.caption_url" frameborder="0" class="border-4 border border-gray-600 rounded-lg row-span-1 h-48" v-if="state && state.phase == 'live'"></iframe>
+      {% include "_event_not_on_states.html" %}
+      {% include "_event_live.html" %}
     </main>
-    <aside class="col-span-3 flex flex-col">
+
+    <aside class="col-span-3 flex flex-col mt-4 lg:mt-0">
       {% include "_now.html" %}
       <section class="rounded-lg flex-1 bg-white flex flex-col">
-        <nav class="-mb-px flex w-full block z-10" aria-label="Tabs">
-          <button v-for="option in sections.options" class="px-4 py-3 text-center border-b-2 font-medium text-xs flex-1" :class="[option == sections.current ? 'border-pink-500 text-pink-600' : 'border-gray-100 text-gray-500 hover:text-gray-700 hover:border-gray-300']" @click="sections.current = option">{{option}}</button>
-        </nav>
-
+        {% include "_sidebar_nav.html" %}
         <div id="main" class="flex-1 flex flex-col">
-          <div v-if="sections.current == 'Announcements'" class="p-4 flex-1 overflow-y-auto">
-            <ul class="h-px">
-              <li v-for="announcement in announcements" class="bg-white border px-3 py-2 rounded-md mb-4 text-sm">
-                <p>{{announcement.primary}}</p>
-                <p v-if="announcement.link_url && announcement.link_text" class="mt-1">
-                  <a :href="announcement.link_url" class="text-pink-600" target="_blank" rel="noopener noreferrer">{{announcement.link_text}}</a>
-                </p>
-              </li>
-            </ul>
-          </div>
-
-          <div v-if="sections.current == 'Sponsors'" class="p-4 flex-1 overflow-y-auto">
-            <ul class="h-px">
-              <li v-for="sponsor in sponsors" class="bg-white border px-3 py-2 rounded-md mb-4 text-sm">
-                <h2 class="font-bold text-lg">{{sponsor.name}}</h2>
-                <p>{{sponsor.description}}</p>
-                <p class="mt-1">
-                  <a v-if="sponsor.video" :href="sponsor.video[0].url" class="text-pink-600 mr-2" target="_blank" rel="noopener noreferrer">📹 Video</a>
-                  <a :href="sponsor.url" class="text-pink-600" target="_blank" rel="noopener noreferrer">Visit {{sponsor.name}}</a>
-                </p>
-              </li>
-            </ul>
-          </div>
-          <div v-if="sections.current == 'About'" class="p-4">
-            <div v-html="state.about" class="text-sm" id="marked"></div>
-          </div>
+          {% include "_announcements.html" %}
+          {% include "_sponsors.html" %}
+          {% include "_about.html" %}
         </div>
       </section>
     </aside>
@@ -85,11 +43,11 @@
         }
       },
       created() {
-        this.getCurrentInfo()
+        this.getState()
         this.setupSocketEvents()
       },
       methods: {
-        async getCurrentInfo() {
+        async getState() {
           this.state = await fetch('/state').then(r => r.json())
           this.announcements = this.state.announcements
           this.sponsors = this.state.sponsors
@@ -120,8 +78,6 @@
             hls.attachMedia(video)
           }
         }
-      },
-      computed: {
       }
     })
   </script>
