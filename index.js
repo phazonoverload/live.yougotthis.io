@@ -57,7 +57,6 @@ io.on('connection', (socket) => {
 
     socket.on('now', async data => {
         console.log('Event of type now')
-        console.log(data)
         if(data.key == key) {
             delete data.key
             io.emit('now', data)
