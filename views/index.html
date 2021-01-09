@@ -39,7 +39,7 @@
         sponsors: [],
         sections: {
           options: ['Announcements', 'Sponsors', 'About'],
-          current: 'Announcements',
+          current: 'Sponsors',
         }
       },
       created() {
@@ -50,7 +50,9 @@
         async getState() {
           this.state = await fetch('/state').then(r => r.json())
           this.announcements = this.state.announcements
-          this.sponsors = this.state.sponsors
+          this.sponsors = this.state.sponsors.map(s => {
+            return { ...s, expanded: false, slug: s.name.toLowerCase().split(' ').join('-') }
+          })
           Vue.nextTick(() => {
             if(this.state.phase == 'live') this.setupPlayer()
           })
@@ -75,6 +77,10 @@
             hls.loadSource(url)
             hls.attachMedia(video)
           }
+        },
+        toggleSponsorVisibility(slug) {
+          const sponsor = this.sponsors.find(s => s.slug == slug)
+          sponsor.expanded = !sponsor.expanded
         }
       }
     })

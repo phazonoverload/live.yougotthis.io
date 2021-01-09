@@ -1,12 +1,19 @@
 <div v-if="sections.current == 'Sponsors'" class="p-4 py-0 xl:py-4 flex-1 overflow-y-auto">
-    <ul class="lg:h-px">
-      <li v-for="sponsor in sponsors" class="bg-white border px-3 py-2 rounded-md mb-4 text-sm">
-        <h2 class="font-bold text-lg">{{sponsor.name}}</h2>
-        <p>{{sponsor.description}}</p>
-        <p class="mt-1">
-          <a v-if="sponsor.video" :href="sponsor.video[0].url" class="text-pink-600 mr-2" target="_blank" rel="noopener noreferrer">📹 Video</a>
-          <a :href="sponsor.url" class="text-pink-600" target="_blank" rel="noopener noreferrer">Visit {{sponsor.name}}</a>
-        </p>
-      </li>
-    </ul>
-  </div>
+  <ul class="lg:h-px">
+    <li v-for="sponsor in sponsors" class="bg-white border rounded-md mb-4 text-sm">
+      <div class="header cursor-pointer relative" @click="toggleSponsorVisibility(sponsor.slug)">
+        <img class="rounded w-full" :class="{ 'rounded-b-none' : sponsor.expanded }" :src="sponsor.logo[0].url" :alt="sponsor.name">
+        <span class="more-less absolute right-4 pointer-events-none text-xs uppercase font-bold text-white">{{ sponsor.expanded ? 'Less' : 'More' }}</span>
+      </div>
+      <div class="main p-4" :id="sponsor.slug" v-if="sponsor.expanded">
+        <p class="text-sm">{{sponsor.description}}</p>
+        <p v-if="sponsor.raffle_url && sponsor.raffle_text" class="text-sm text-gray-600 italic my-2">Raffle: {{sponsor.raffle_text}}</p>
+        <div>
+          <a :href="sponsor.url" class="mt-2 mr-1 text-sm leading-6 font-medium rounded-md text-white bg-pink-600 hover:bg-pink-500 active:bg-pink-700 transition ease-in-out duration-150 px-3 py-1 inline-block" target="_blank" rel="noopener noreferrer">Visit {{sponsor.name}}</a>
+          <a v-if="sponsor.video" :href="sponsor.video[0].url" class="mt-2 mr-1 text-sm leading-6 font-medium rounded-md text-white bg-pink-600 hover:bg-pink-500 active:bg-pink-700 transition ease-in-out duration-150 px-3 py-1 inline-block" target="_blank" rel="noopener noreferrer">Watch {{sponsor.name}}'s video</a>
+          <a v-if="sponsor.raffle_url && sponsor.raffle_text" :href="sponsor.raffle_url" class="mt-2 mr-1 text-sm leading-6 font-medium rounded-md text-white bg-pink-600 hover:bg-pink-500 active:bg-pink-700 transition ease-in-out duration-150 px-3 py-1 inline-block" target="_blank" rel="noopener noreferrer">Enter {{sponsor.name}}'s raffle</a>
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>
