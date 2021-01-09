@@ -62,9 +62,7 @@
           this.socket.on('announcement:delete', uaid => this.announcements = this.announcements.filter(a => a.uaid != uaid))
           this.socket.on('phase', data => {
             this.state.phase = data.phase;
-            Vue.nextTick(() => {
-              if(this.state.phase == 'live') this.setupPlayer()
-            })
+            Vue.nextTick(() => { if(this.state.phase == 'live') this.setupPlayer() })
           })
         },
         setupPlayer() {
