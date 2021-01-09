@@ -140,6 +140,7 @@
           <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
             <div>
               <button @click="refresh" type="button" class="mr-2 inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Force Client Refresh</button>
+              <button @click="fallback" type="button" class="mr-2 inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Push to Fallback</button>
             </div>
           </div>
         </div>
@@ -197,8 +198,13 @@
           this.now.form = { primary: '', secondary: '', button_url: '', button_text: '' }
         },
         refresh() {
-          if(confirm('You sure?')) {
+          if(confirm('You sure you want to force a refresh?')) {
             this.socket.emit('refresh', { key: this.key })
+          }
+        },
+        fallback() {
+          if(confirm('You sure you want to force to fallback?')) {
+            this.socket.emit('fallback', { key: this.key })
           }
         },
         updatePhase() {

@@ -60,6 +60,7 @@
         setupSocketEvents() {
           this.socket.on('now', data => this.state = { ...this.state, ...data })
           this.socket.on('refresh', () => location.reload())
+          this.socket.on('fallback', () => window.location.href = "https://fallback.yougotthis.io")
           this.socket.on('announcement:create', data => this.announcements.unshift(data))
           this.socket.on('announcement:delete', uaid => this.announcements = this.announcements.filter(a => a.uaid != uaid))
           this.socket.on('phase', data => {

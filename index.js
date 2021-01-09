@@ -99,6 +99,14 @@ io.on('connection', (socket) => {
             io.emit('refresh')
         }
     })
+
+    socket.on('fallback', data => {
+        console.log('Event of type fallback')
+        if(data.key == key) {
+            delete data.key
+            io.emit('fallback')
+        }
+    })
 });
 
 http.listen(process.env.PORT || 3000, console.log('Listening on port 3000'))
