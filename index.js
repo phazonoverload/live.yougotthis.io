@@ -28,6 +28,14 @@ app.get('/operator', (req, res) => {
     res.render('admin.html')
 })
 
+app.get('/sponsors', (req, res) => {
+    res.redirect('/')
+})
+
+app.get('/sponsors/:sponsor', (req, res) => {
+    res.render('sponsor.html', { sponsor: req.params.sponsor })
+})
+
 app.get('/now', async (req, res) => {
     console.log('GET /now')
     const records = await db.now.read({})

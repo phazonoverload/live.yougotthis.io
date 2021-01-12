@@ -10,7 +10,7 @@
         <p v-if="sponsor.raffle_url && sponsor.raffle_text" class="text-sm text-gray-600 italic my-2">Raffle: {{sponsor.raffle_text}}</p>
         <div>
           <a :href="sponsor.url" class="mt-2 mr-1 text-sm leading-6 font-medium rounded-md text-white bg-pink-600 hover:bg-pink-500 active:bg-pink-700 transition ease-in-out duration-150 px-3 py-1 inline-block" target="_blank" rel="noopener noreferrer">Visit {{sponsor.name}}</a>
-          <a v-if="sponsor.video" :href="sponsor.video[0].url" class="mt-2 mr-1 text-sm leading-6 font-medium rounded-md text-white bg-pink-600 hover:bg-pink-500 active:bg-pink-700 transition ease-in-out duration-150 px-3 py-1 inline-block" target="_blank" rel="noopener noreferrer">Watch {{sponsor.name}}'s video</a>
+          <a v-if="sponsor.video" :href="`/sponsors/${sponsor.slug}`" class="mt-2 mr-1 text-sm leading-6 font-medium rounded-md text-white bg-pink-600 hover:bg-pink-500 active:bg-pink-700 transition ease-in-out duration-150 px-3 py-1 inline-block" target="_blank" rel="noopener noreferrer">Watch {{sponsor.name}}'s video</a>
           <a v-if="sponsor.raffle_url && sponsor.raffle_text" :href="sponsor.raffle_url" class="mt-2 mr-1 text-sm leading-6 font-medium rounded-md text-white bg-pink-600 hover:bg-pink-500 active:bg-pink-700 transition ease-in-out duration-150 px-3 py-1 inline-block" target="_blank" rel="noopener noreferrer">Enter {{sponsor.name}}'s raffle</a>
         </div>
       </div>
