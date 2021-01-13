@@ -7,12 +7,14 @@
   {% include "_header.html" %}
 
   <div id="app" class="flex-1 lg:grid gap-4 grid-cols-12 p-6 max-w-screen-2xl mx-auto">
-    <main class="col-span-9 flex flex-col">
+    <img class="mt-12 w-12 col-span-12" src="/puff.svg" v-if="!state" />
+
+    <main class="col-span-9 flex flex-col" v-if="state">
       {% include "_event_not_on_states.html" %}
       {% include "_event_live.html" %}
     </main>
 
-    <aside class="col-span-3 flex flex-col mt-4 lg:mt-0">
+    <aside class="col-span-3 flex flex-col mt-4 lg:mt-0" v-if="state">
       {% include "_now.html" %}
       <section class="rounded-lg flex-1 bg-white flex flex-col">
         {% include "_sidebar_nav.html" %}

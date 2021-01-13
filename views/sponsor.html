@@ -7,7 +7,8 @@
   {% include "_header.html" %}
 
   <div id="app" class="p-6 max-w-screen-lg mx-auto mt-4">
-    <video controls class="rounded-lg bg-black w-lg"></video>
+    <img class="mt-12 w-12 col-span-12" src="/puff.svg" v-if="!state" />
+    <video controls class="rounded-lg bg-black w-lg" v-if="state"></video>
     <section class="rounded-lg shadow-sm mb-4 bg-white p-4 mt-4" v-if="state">
       <h1 class="font-bold text-lg">{{sponsor.name}}</h1>
       <p class="text-sm mt-2 mb-4">{{sponsor.description}}</p>
@@ -41,8 +42,10 @@
             return { ...s, slug: s.name.toLowerCase().split(' ').join('-') }
           })
           this.sponsor = sponsors.find(s => s.slug == sponsor)
-          const video = document.querySelector('video')
-          video.src = this.sponsor.video[0].url
+          Vue.nextTick(() => {
+            const video = document.querySelector('video')
+            video.src = this.sponsor.video[0].url
+          })
         },
         setupSocketEvents() {
           this.socket.on('refresh', () => location.reload())
