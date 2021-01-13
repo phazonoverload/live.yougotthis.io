@@ -49,6 +49,12 @@
       methods: {
         async getState() {
           this.state = await fetch('/state').then(r => r.json())
+          this.state.buttons = []
+          const button_texts = this.state.button_text.split(',').map(b => b.trim())
+          const button_urls = this.state.button_url.split(',').map(b => b.trim())
+          for(let i=0; i<button_texts.length; i++) {
+            this.state.buttons.push({ text: button_texts[i], url: button_urls[i] })
+          }
           this.announcements = this.state.announcements
           this.sponsors = this.state.sponsors.map(s => {
             return { ...s, expanded: false, slug: s.name.toLowerCase().split(' ').join('-') }
@@ -58,7 +64,15 @@
           })
         },
         setupSocketEvents() {
-          this.socket.on('now', data => this.state = { ...this.state, ...data })
+          this.socket.on('now', data => {
+            this.state = { ...this.state, ...data }
+            this.state.buttons = []
+            const button_texts = this.state.button_text.split(',').map(b => b.trim())
+            const button_urls = this.state.button_url.split(',').map(b => b.trim())
+            for(let i=0; i<button_texts.length; i++) {
+              this.state.buttons.push({ text: button_texts[i], url: button_urls[i] })
+            }
+          })
           this.socket.on('refresh', () => location.reload())
           this.socket.on('fallback', () => window.location.href = "https://fallback.yougotthis.io")
           this.socket.on('announcement:create', data => this.announcements.unshift(data))
