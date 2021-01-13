@@ -48,7 +48,6 @@
           })
         },
         setupSocketEvents() {
-          this.socket.on('refresh', () => location.reload())
           this.socket.on('fallback', () => window.location.href = "https://fallback.yougotthis.io")
           this.socket.on('phase', data => {
             if(data.phase == 'live') window.location.href = "https://live.yougotthis.io"
