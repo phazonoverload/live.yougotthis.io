@@ -45,7 +45,8 @@
           options: ['Announcements', 'Sponsors', 'About'],
           current: 'Announcements',
         },
-        muted: true
+        muted: true,
+        playing: true
       },
       created() {
         this.getState()
@@ -106,7 +107,13 @@
           const video = document.querySelector('video')
           video.muted = !video.muted
           this.muted = !this.muted
-        }
+        },
+        togglePlay() {
+          const video = document.querySelector('video')
+          if(video.paused) video.play()
+          else video.pause()
+          this.playing = !this.playing
+        },
       }
     })
   </script>

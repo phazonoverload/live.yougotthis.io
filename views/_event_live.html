@@ -1,2 +1,2 @@
-<video autoplay muted class="rounded-lg row-span-3 mb-4 flex-1 bg-black" v-if="state && state.phase == 'live'"></video>
-<iframe :src="state.caption_url" frameborder="0" class="border-4 border border-gray-600 rounded-lg row-span-1 h-48" v-if="state && state.phase == 'live'"></iframe>
+<video tabindex="-1" autoplay muted class="rounded-lg row-span-3 mb-4 flex-1 bg-black" v-if="state && state.phase == 'live'"></video>
+<iframe tabindex="-1" :src="state.caption_url" frameborder="0" class="border-4 border border-gray-600 rounded-lg row-span-1 h-48" v-if="state && state.phase == 'live'"></iframe>
