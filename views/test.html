@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>{% include "_head.html" %}</head>
+
+<body class="flex flex-col h-screen bg-gray-800">
+  {% include "_header.html" %}
+
+  <div id="app" class="p-6 max-w-screen-lg mx-auto mt-4">
+    <video controls autoplay muted class="rounded-lg bg-black w-lg"></video>
+  </div>
+
+  <script src="/hls.js"></script>
+  <script>
+    const video = document.querySelector('video')
+    fetch('/state').then(r => r.json()).then(state => {
+      const url = state.stream_url
+      if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = url
+      } else if (Hls.isSupported()) {
+        hls = new Hls()
+        hls.loadSource(url)
+        hls.attachMedia(video)
+      }
+    })
+  </script>
+</body>
+
+</html>

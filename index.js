@@ -36,6 +36,10 @@ app.get('/sponsors/:sponsor', (req, res) => {
     res.render('sponsor.html', { sponsor: req.params.sponsor })
 })
 
+app.get('/test', (req, res) => {
+    res.render('test.html')
+})
+
 app.get('/now', async (req, res) => {
     console.log('GET /now')
     const records = await db.now.read({})
