@@ -4,6 +4,7 @@
 <head>{% include "_head.html" %}</head>
 
 <body class="flex flex-col h-screen bg-gray-800">
+
   {% include "_header.html" %}
 
   <div id="app" class="flex-1 lg:grid gap-4 grid-cols-12 p-6 max-w-screen-2xl mx-auto">
@@ -15,6 +16,7 @@
     </main>
 
     <aside class="col-span-3 flex flex-col mt-4 lg:mt-0" v-if="state">
+      {% include "_player_controls.html" %}
       {% include "_now.html" %}
       <section class="rounded-lg flex-1 bg-white flex flex-col">
         {% include "_sidebar_nav.html" %}
@@ -42,7 +44,8 @@
         sections: {
           options: ['Announcements', 'Sponsors', 'About'],
           current: 'Announcements',
-        }
+        },
+        muted: true
       },
       created() {
         this.getState()
@@ -98,6 +101,11 @@
         toggleSponsorVisibility(slug) {
           const sponsor = this.sponsors.find(s => s.slug == slug)
           sponsor.expanded = !sponsor.expanded
+        },
+        toggleMute() {
+          const video = document.querySelector('video')
+          video.muted = !video.muted
+          this.muted = !this.muted
         }
       }
     })
