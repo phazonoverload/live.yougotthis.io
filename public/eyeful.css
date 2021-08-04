@@ -1,0 +1,8 @@
+@font-face {
+    font-family: 'Eyeful';
+    src: url('eyeful.woff2') format('woff2'),
+         url('eyeful.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
